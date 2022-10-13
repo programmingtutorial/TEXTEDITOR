@@ -1,0 +1,264 @@
+package notepad;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+public class editor implements ActionListener {
+	JComboBox fontbox;  
+	JTextArea textarea;
+	JScrollPane scrollpane;
+	JSpinner fontsizespinner;
+	JLabel fontlabel;
+	JFrame frame;
+	JMenuBar menubar;
+	JMenu filemenu,editmenu,thememenu;
+	JMenuItem Newitem,saveitem,saveasitem,openitem,exititem,coloritem,blackitem,whiteitem;
+	ImageIcon image =new ImageIcon("images.png");
+	editor(){
+		frame= new JFrame("TEXT EDITOR");
+				
+		// menu bar starts
+		menubar = new JMenuBar();
+		filemenu= new JMenu("FILE");
+		editmenu= new JMenu("EDIT");
+		thememenu=new JMenu("THEMES");
+		Newitem = new JMenuItem("New"); 
+		saveitem = new JMenuItem("Save");
+		openitem = new JMenuItem("Open");
+		exititem = new JMenuItem("Exit");
+		coloritem = new JMenuItem("Font Color");
+		blackitem = new JMenuItem("DARK THEME");
+		whiteitem = new JMenuItem("LIGHT THEME");
+		
+		// submenu start
+		filemenu.add(Newitem);
+		filemenu.add(openitem);
+		filemenu.add(saveitem);
+		filemenu.add(exititem);
+		editmenu.add(coloritem);
+		thememenu.add(whiteitem);
+		thememenu.add(blackitem);
+	  //add actionlistener 
+		Newitem.addActionListener(this);
+		openitem.addActionListener(this);
+		saveitem.addActionListener(this);
+		exititem.addActionListener(this);
+		coloritem.addActionListener(this);
+		whiteitem.addActionListener(this);
+		blackitem.addActionListener(this);
+		//adding logos to the correspondent submenus
+		
+		//adding shortcuts
+		filemenu.setMnemonic(KeyEvent.VK_F);
+		editmenu.setMnemonic(KeyEvent.VK_E);
+		thememenu.setMnemonic(KeyEvent.VK_T);
+		
+		saveitem.setMnemonic(KeyEvent.VK_S);
+		openitem.setMnemonic(KeyEvent.VK_O);
+		
+		// adding submenu to menubar
+		menubar.add(filemenu);
+		menubar.add(editmenu);
+		menubar.add(thememenu);
+		
+		//menu bar ends
+		fontlabel= new JLabel("Font:- ");
+		fontsizespinner= new JSpinner();
+		fontsizespinner.setPreferredSize(new Dimension(50,25));
+		fontsizespinner.setValue(20);
+		fontsizespinner.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+			textarea.setFont(new Font(textarea.getFont().getFamily(),Font.PLAIN,(int)fontsizespinner.getValue()));
+				
+			}
+		});
+		textarea = new JTextArea();
+		String[] fonts=GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+		fontbox= new JComboBox(fonts);
+		fontbox.addActionListener(this);
+		textarea.setLineWrap(true);
+		textarea.setWrapStyleWord(true);
+		textarea.setFont(new Font("Arial",Font.PLAIN,20));
+		frame.add(fontlabel);
+		frame.add(fontsizespinner);
+		frame.add(fontbox);
+		scrollpane= new JScrollPane(textarea);
+		scrollpane.setPreferredSize(new Dimension(970,600));
+		scrollpane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		frame.add(scrollpane);
+	    frame.setJMenuBar(menubar);
+		frame.setResizable(false);
+		frame.addWindowListener(new WindowListener(){
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+		int closing= JOptionPane.showConfirmDialog(frame," DO YOU WANT TO EXIT ","CONFIRM",JOptionPane.YES_NO_OPTION);	
+		         if(closing==JOptionPane.YES_OPTION) {
+		        	 frame.dispose();
+		         }else {
+		        	 frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		         }
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}});
+	
+		frame.setSize(1000,700);
+		frame.setIconImage(image.getImage());
+		frame.setLayout(new FlowLayout(0));
+		frame.setLocationRelativeTo(frame);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+	}
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		if(e.getSource()==exititem) {
+			System.exit(0);}
+		if(e.getSource()==fontbox) {
+			textarea.setFont(new Font((String)fontbox.getSelectedItem(),Font.PLAIN,textarea.getFont().getSize()));
+		}
+		
+		if(e.getSource()==blackitem) {
+			textarea.setBackground(Color.DARK_GRAY);
+			}
+		if(e.getSource()==whiteitem) {
+			textarea.setBackground(Color.white);
+		}
+		
+		if(e.getSource()==saveitem) {
+			save();}
+		if(e.getSource()==Newitem) {
+			textarea.setText("");
+		}
+		if(e.getSource()==coloritem) {
+			JColorChooser colorchooser= new JColorChooser();
+			Color color= colorchooser.showDialog(null,"Choose a color",Color.black);
+			textarea.setForeground(color);
+		}
+		
+		if(e.getSource()==openitem) {
+			JFileChooser filechooser = new JFileChooser();
+			filechooser.setCurrentDirectory(new File("Documents"));
+			FileNameExtensionFilter filter= new FileNameExtensionFilter("Text files","txt");
+			FileNameExtensionFilter filter2= new FileNameExtensionFilter("Java files","java");
+			FileNameExtensionFilter filter3= new FileNameExtensionFilter("html files","html");
+			filechooser.setFileFilter(filter3);
+			filechooser.setFileFilter(filter2);
+			filechooser.setFileFilter(filter);
+			int response=filechooser.showOpenDialog(frame);
+			if(response==JFileChooser.APPROVE_OPTION) {
+				File file = new File(filechooser.getSelectedFile().getAbsolutePath());
+				String filename=file.getName();
+				frame.setTitle(filename);
+				Scanner filein=null;
+				try {
+					filein= new Scanner(file);
+					if(file.isFile()) {
+						while(filein.hasNextLine()) {
+							String line=filein.nextLine()+"\n";
+							textarea.append(line);
+						}
+					}
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				finally {
+					filein.close();
+					}
+				}
+			}
+	}
+	
+	public void save() {
+		JFileChooser filechooser=new JFileChooser();
+		filechooser.setCurrentDirectory(new File("Documents"));
+		int response=filechooser.showSaveDialog(null);
+		if(response==JFileChooser.APPROVE_OPTION) {
+			File file;
+			PrintWriter fileout=null;
+			file= new File(filechooser.getSelectedFile().getAbsolutePath());
+			String filename= file.getName();
+			frame.setTitle(filename);
+			try {
+				fileout=new PrintWriter(file);
+				fileout.println(textarea.getText());
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			finally {
+				fileout.close();
+			}
+		}
+		
+	}
+	}
+
+
+
+//create a seperate java class for the Main class
+package notepad;
+
+public class Main {
+
+	public static void main(String[] args) {
+		
+new editor();
+
+	}
+
+}
+
